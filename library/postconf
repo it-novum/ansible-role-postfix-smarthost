@@ -1,0 +1,30 @@
+#!/usr/bin/python
+# coding: utf-8
+from __future__ import (absolute_import, division, print_function)
+__metaclass__ = type
+
+from ansible.module_utils.basic import AnsibleModule
+
+# TODO: Documentation
+
+
+def main():
+    module = AnsibleModule(
+        argument_spec=dict(
+            name={"required": True, "type": "str"},
+            value={"required": True, "type": "str"},
+        )
+    )
+    name = module.params['name']
+    value = module.params['value']
+
+    rc, stdout, stderr = module.run_command(['postconf', '-h', name], check_rc=True)
+    if stdout.strip() == value:
+        module.exit_json(changed=False, postconf={name: value})
+    else:
+        rc, stdout, stderr = module.run_command(['postconf', '-e', '{}={}'.format(name, value)], check_rc=True)
+        module.exit_json(changed=True, postconf={name: value})
+
+
+if __name__ == '__main__':
+    main()

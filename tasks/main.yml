@@ -1,0 +1,40 @@
+- fail: msg="Please set postfix_relayhost"
+  when: not postfix_relayhost is defined
+
+- name: postfix_destinations default
+  set_fact: postfix_destinations="{{ ansible_hostname }}, {{ansible_fqdn}}, localhost"
+  when: not postfix_destinations is defined
+
+- name: Package configuration
+  debconf: name=postfix question={{item.question}} value={{item.value}} vtype={{item.vtype}}
+  with_items:
+    - question: postfix/main_mailer_type
+      value: "Internet with smarthost"
+      vtype: select
+    - question: postfix/mynetworks
+      value: "{{postfix_mynetworks}}"
+      vtype: string
+    - question: postfix/destinations
+      value: "{{postfix_destinations}}"
+      vtype: string
+    - question: postfix/relayhost
+      value: "{{postfix_relayhost}}"
+      vtype: string
+
+- name: Installation
+  apt: "name={{ item }}"
+  with_items:
+    - postfix
+    - procmail
+
+- name: Postfix configuration
+  postconf: "name=\"{{item.key}}\" value=\"{{item.value}}\""
+  with_items:
+    - key: mynetworks
+      value: "{{postfix_mynetworks}}"
+    - key: relayhost
+      value: "{{postfix_relayhost}}"
+    - key: destinations
+      value: "{{postfix_destinations}}"
+    - key: mailbox_command
+      value: /usr/bin/procmail
