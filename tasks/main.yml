@@ -34,7 +34,7 @@
       value: "{{postfix_mynetworks}}"
     - key: relayhost
       value: "{{postfix_relayhost}}"
-    - key: destinations
+    - key: mydestination
       value: "{{postfix_destinations}}"
     - key: mailbox_command
       value: /usr/bin/procmail
