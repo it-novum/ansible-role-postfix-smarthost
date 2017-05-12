@@ -38,3 +38,8 @@
       value: "{{postfix_destinations}}"
     - key: mailbox_command
       value: /usr/bin/procmail
+
+- name: Restart postfix
+  service:
+    name: postfix
+    state: restarted
